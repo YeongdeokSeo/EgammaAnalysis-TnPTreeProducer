@@ -1,4 +1,4 @@
-from CRABClient.UserUtilities import config, getUsernameFromSiteDB
+from CRABClient.UserUtilities import config
 import sys
 
 # this will use CRAB client API
@@ -28,14 +28,14 @@ doPhoTree = 'doPhoID=True'
 #doHLTTree = 'doTrigger=False'
 #calibEn   = 'useCalibEn=False'
 
-mainOutputDir = '/store/group/phys_egamma/soffi/TnP/ntuples_06152018/%s' % submitVersion
+mainOutputDir = '/store/group/phys_llp/Run2DelayedPhotonNtuple/2018/TnP/ntuples_03022022/%s' % submitVersion
 
 config.General.transferLogs = False
 
 config.JobType.pluginName  = 'Analysis'
 
 # Name of the CMSSW configuration file
-config.JobType.psetName  = '/afs/cern.ch/work/s/soffi/EGM-WORK/CMSSW-1011-2018DataTnP/src/EgammaAnalysis/TnPTreeProducer/python/TnPTreeProducer_cfg.py'
+config.JobType.psetName  = '/storage/af/user/yeseo/CMSSW_10_6_4_patch1/src/EgammaAnalysis/TnPTreeProducer/python/TnPTreeProducer_cfg.py'
 #config.Data.allowNonValidInputDataset = False
 config.JobType.sendExternalFolder     = True
 
@@ -44,7 +44,7 @@ config.Data.publication = False
 config.Data.allowNonValidInputDataset = True
 #config.Data.publishDataName = 
 
-config.Site.storageSite = 'T2_CH_CERN'
+config.Site.storageSite = 'T2_US_Caltech'
 
 
  
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     config.Data.inputDataset    = '/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISpring18MiniAOD-100X_upgrade2018_realistic_v10-v2/MINIAODSIM'
     config.Data.outLFNDirBase = '%s/%s/' % (mainOutputDir,'mc')
     config.JobType.pyCfgParams  = ['isMC=True',doEleTree,doPhoTree,'GT=100X_upgrade2018_realistic_v10']
-    config.Data.userInputFiles = lfnList
+#    config.Data.userInputFiles = lfnList
     config.Data.splitting = 'FileBased'
     config.General.requestName  = 'DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8'
     config.Data.unitsPerJob = 1
