@@ -140,7 +140,7 @@ if (varOptions.isMC):
     options['GLOBALTAG']           = 'auto:run2_mc'
 else:
     options['OUTPUT_FILE_NAME']    = "TnPTree_data.root"
-    options['GLOBALTAG']           = '102X_dataRun2_v11'
+    options['GLOBALTAG']           = '102X_dataRun2_v12'
 
 if varOptions.GT != "auto" :
     options['GLOBALTAG'] = varOptions.GT
@@ -183,7 +183,11 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.MessageLogger.cerr.threshold = ''
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
-process.source = cms.Source("PoolSource", fileNames = options['INPUT_FILE_NAME'])
+process.source = cms.Source("PoolSource",
+        fileNames = cms.untracked.vstring(
+        '/store/data/Run2018B/EGamma/MINIAOD/17Sep2018-v1/60000/FC233A84-73D8-054E-B774-CE80543407D8.root'                
+            )
+)
 process.maxEvents = cms.untracked.PSet( input = options['MAXEVENTS'])
 
 if options['addSUSY']    : print "  -- Including variables for SUSY       -- "

@@ -155,6 +155,10 @@ PhoProbeVariablesToStore = cms.PSet(
 
     ph_mva80X       = cms.InputTag("photonMVAValueMapProducer:PhotonMVAEstimatorRun2Spring16NonTrigV1Values"),
     ph_mva94X       = cms.InputTag("photonMVAValueMapProducer:PhotonMVAEstimatorRunIIFall17v1p1Values"),
+
+#pho shape
+    ph_full5x5_smajor   = cms.string("full5x5_showerShapeVariables(). smMajor"),
+    ph_full5x5_sminor   = cms.string("full5x5_showerShapeVariables(). smMinor"),
 )
 
 
