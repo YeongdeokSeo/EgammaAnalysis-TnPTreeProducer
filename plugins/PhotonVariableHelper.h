@@ -50,7 +50,7 @@ class PhotonVariableHelper : public edm::EDProducer {
   virtual void produce(edm::Event & iEvent, const edm::EventSetup & iSetup) override;
 
 private:
-  edm::EDGetTokenT<pat::Photon > probesToken_;
+  edm::EDGetTokenT<reco::PhotonCoreCollection> probesToken_;
   edm::EDGetTokenT<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > ebRecHitsToken_;
   edm::EDGetTokenT<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > eeRecHitsToken_;
 
@@ -59,7 +59,7 @@ private:
 
 template<class T>
 PhotonVariableHelper<T>::PhotonVariableHelper(const edm::ParameterSet & iConfig) :
-  probesToken_(consumes<pat::Photon>(iConfig.getParameter<edm::InputTag>("probes"))),
+  probesToken_(consumes<reco::PhotonCoreCollection>(iConfig.getParameter<edm::InputTag>("probes"))),
   ebRecHitsToken_(consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > >(iConfig.getParameter<edm::InputTag>("ebRecHits"))),
   eeRecHitsToken_(consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > >(iConfig.getParameter<edm::InputTag>("eeRecHits")))
   {

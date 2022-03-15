@@ -73,7 +73,7 @@ def setGoodParticlesMiniAOD(process, options):
                                           )
 
     process.phoVarHelper = cms.EDProducer("PatPhotonVariableHelper",
-                                          probes           = cms.InputTag(options['PHOTON_COLL']),
+                                          probes           = cms.InputTag("reducedEgamma", "reducedSuperClusters", "RECO"),
 
                                           ebRecHits = cms.InputTag("reducedEgamma", "reducedEBRecHits", "RECO"),
                                           eeRecHits = cms.InputTag("reducedEgamma", "reducedEERecHits", "RECO"),
