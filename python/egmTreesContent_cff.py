@@ -174,8 +174,8 @@ PhoProbeVariablesToStore = cms.PSet(
     ph_chWorIso = cms.string("chargedHadronWorstVtxIso"),
 
 #pho shape
-    ph_sMajor   = cms.string("phoVarHelper::phoSMajor"),
-    ph_sMinor   = cms.string("phoVarHelper::phoSMinor"),
+    ph_sMajor   = cms.InputTag("phoVarHelper:phoSMajor"),
+    ph_sMinor   = cms.InputTag("phoVarHelper:phoSMinor"),
 )
 
 if not isReleaseAbove(10, 6): # old way of accessing these in CMSSW_10_2
