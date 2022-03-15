@@ -5,6 +5,7 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 #include "DataFormats/Common/interface/ValueMap.h"
 
@@ -34,6 +35,9 @@
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterTools.h"
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
 
+#include "DataFormats/EgammaReco/interface/SuperCluster.h"
+#include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"
+
 #include "TMath.h"
 
 
@@ -46,7 +50,7 @@ class PhotonVariableHelper : public edm::EDProducer {
   virtual void produce(edm::Event & iEvent, const edm::EventSetup & iSetup) override;
 
 private:
-  edm::EDGetTokenT<std::vector<T> > probesToken_;
+  edm::EDGetTokenT<pat::Photon > probesToken_;
   edm::EDGetTokenT<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > ebRecHitsToken_;
   edm::EDGetTokenT<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > eeRecHitsToken_;
 
@@ -55,7 +59,7 @@ private:
 
 template<class T>
 PhotonVariableHelper<T>::PhotonVariableHelper(const edm::ParameterSet & iConfig) :
-  probesToken_(consumes<std::vector<T> >(iConfig.getParameter<edm::InputTag>("probes"))),
+  probesToken_(consumes<pat::Photon>(iConfig.getParameter<edm::InputTag>("probes"))),
   ebRecHitsToken_(consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > >(iConfig.getParameter<edm::InputTag>("ebRecHits"))),
   eeRecHitsToken_(consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > >(iConfig.getParameter<edm::InputTag>("eeRecHits")))
   {
@@ -74,37 +78,76 @@ template<class T>
 void PhotonVariableHelper<T>::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
 
   // read input
-  edm::Handle<std::vector<T>> probes;
-  iEvent.getByToken(probesToken_, probes);
-  const reco::SuperCluster& phosuperClus = *probes.superCluster_();
-  const reco::CaloCluster &phoseedCluster = *phosuperClus.seed();
-  const bool phoiseb = phoseedCluster.hitsAndFractions()[0].first.subdetId() == EcalBarrel;
+  //edm::Handle<pat::Photon> probes;
+  //iEvent.getByToken(probesToken_, probes);
+
+  //edm::Handle<reco::PhotonCoreCollection>& photonCoreHandle;
+  edm::Handle<reco::PhotonCoreCollection> photonCoreHandle;
+  iEvent.getByToken(probesToken_, photonCoreHandle);
+
+  //const reco::SuperCluster& phosuperClus = *probes.superCluster();
+  //const reco::CaloCluster &phoseedCluster = *phosuperClus.seed();
+
+  //const bool phoiseb = phoseedCluster.hitsAndFractions()[0].first.subdetId() == EcalBarrel;
 
   edm::Handle<EcalRecHitCollection> phoEBRecHits_;
   iEvent.getByToken(ebRecHitsToken_, phoEBRecHits_);
   edm::Handle<EcalRecHitCollection> phoEERecHits_;
   iEvent.getByToken(eeRecHitsToken_, phoEERecHits_);
 
-  const EcalRecHitCollection *phorecHits = phoiseb ? phoEBRecHits_.product():phoEERecHits_.product();
+
 
   // prepare vector for output
   std::vector<float> phoSMajorVals;
   std::vector<float> phoSMinorVals;
 
-
+  /*
   typename std::vector<T>::const_iterator probe, endprobes = probes->end();
 
   for (probe = probes->begin(); probe != endprobes; ++probe) {
+  */
 
-    Cluster2ndMoments moments = EcalClusterTools::cluster2ndMoments(*phoseedCluster, *phorecHits);
+  const EcalRecHitCollection* hits = nullptr;
+  for (unsigned int PhotonSize = 0; PhotonSize < photonCoreHandle->size(); PhotonSize++){
+    reco::PhotonCoreRef phoCoreRef(reco::PhotonCoreRef(photonCoreHandle, PhotonSize));
+    reco::SuperClusterRef scRef = phoCoreRef->superCluster();
+
+    int subdet = scRef->seed()->hitsAndFractions()[0].first.subdetId();
+    if (subdet == EcalBarrel) {
+      hits = phoEBRecHits_.product();
+    }
+    else if (subdet == EcalEndcap) {
+      hits = phoEERecHits_.product();
+    }
+    else {
+      edm::LogWarning("") << "GEDPhotonProducer: do not know if it is a barrel or endcap SuperCluster: " << subdet;
+    }
+
+    if (hits) {
+      Cluster2ndMoments moments = EcalClusterTools::cluster2ndMoments(*(scRef->seed()), *hits);
+
+      phoSMajorVals.push_back(moments.sMaj);
+      phoSMinorVals.push_back(moments.sMin);
+    }
+
+  }
+
+
+/*
+  for (edm::View<pat::Photon>::const_iterator probe = probes->begin(); probe != probes->end(); ++probe) {
+
+    Cluster2ndMoments moments = EcalClusterTools::cluster2ndMoments(*(scRef->seed()), *hits);
 
     phoSMajorVals.push_back(moments.sMaj);
     phoSMinorVals.push_back(moments.sMin);
   }
+  */
 
   // convert into ValueMap and store
-  writeValueMap(iEvent, probes, phoSMajorVals, "phoSMajor");
-  writeValueMap(iEvent, probes, phoSMinorVals, "phoSMinor");
+  //writeValueMap(iEvent, probes, phoSMajorVals, "phoSMajor");
+  //writeValueMap(iEvent, probes, phoSMinorVals, "phoSMinor");
+  writeValueMap(iEvent, photonCoreHandle, phoSMajorVals, "phoSMajor");
+  writeValueMap(iEvent, photonCoreHandle, phoSMinorVals, "phoSMinor");
 
 }
 
