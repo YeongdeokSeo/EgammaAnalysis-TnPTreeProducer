@@ -1,5 +1,5 @@
-<Flags CPPDEFINES="CMSSW_MAJOR_VERSION=$(shell echo ${CMSSW_VERSION} | cut -d'_' -f2)"/>
-<Flags CPPDEFINES="CMSSW_MINOR_VERSION=$(shell echo ${CMSSW_VERSION} | cut -d'_' -f3)"/>
+<Flags CPPDEFINES="CMSSW_MAJOR_VERSION=10"/>
+<Flags CPPDEFINES="CMSSW_MINOR_VERSION=2"/>
 <library   name="EgammaAnalysisTnPTreeProducer_plugins" file="*.cc">
   <use   name="FWCore/Framework"/>
   <use   name="FWCore/PluginManager"/>
